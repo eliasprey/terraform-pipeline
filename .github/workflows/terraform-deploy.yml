@@ -1,0 +1,45 @@
+name: Terraform Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Nie zwei Deployments gleichzeitig – das zweite wartet, bis das erste fertig ist
+concurrency:
+  group: terraform-production
+  cancel-in-progress: false
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: us-east-1
+  TF_VAR_vorname: ${{ vars.VORNAME }}
+  TF_VAR_key_name: ${{ vars.KEY_NAME }}
+  TF_IN_AUTOMATION: "true"
+
+jobs:
+  deploy:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v5
+
+      - name: Terraform installieren
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Init
+        run: terraform init -input=false
+
+      - name: Plan
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Apply
+        run: terraform apply -input=false tfplan
+
+      - name: Outputs anzeigen
+        run: terraform output
