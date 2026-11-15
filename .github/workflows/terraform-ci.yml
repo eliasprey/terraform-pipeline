@@ -41,3 +41,10 @@ jobs:
 
       - name: Plan
         run: terraform plan -input=false -out=tfplan
+
+      - name: Plan in die Zusammenfassung schreiben
+        run: |
+          echo "## Terraform Plan" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          terraform show -no-color tfplan >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
