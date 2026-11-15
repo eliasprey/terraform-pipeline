@@ -55,6 +55,8 @@ resource "aws_instance" "server" {
   key_name                    = var.key_name
 
   tags = {
-    Name = "${var.vorname}-server"
+    Name       = "${var.vorname}-server"
+    Umgebung   = "production"
+    Verwaltung = "terraform-pipeline"
   }
 }
